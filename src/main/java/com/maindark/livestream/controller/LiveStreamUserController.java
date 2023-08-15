@@ -4,7 +4,6 @@ import com.maindark.livestream.domain.LiveStreamUser;
 import com.maindark.livestream.result.CodeMsg;
 import com.maindark.livestream.result.Result;
 import com.maindark.livestream.service.LiveStreamUserService;
-import com.maindark.livestream.vo.LoginVo;
 import com.maindark.livestream.vo.ResetPasswordVo;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -24,6 +23,6 @@ public class LiveStreamUserController {
         String password = resetPasswordVo.getPassword();
        log.info("id:"+userId +" password:" + password +" token:" + token);
        Boolean res = liveStreamUserService.updatePassword(token,userId,password);
-       return Result.success(true);
+       return Result.success(res);
     }
 }
