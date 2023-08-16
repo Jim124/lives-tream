@@ -1,19 +1,16 @@
 package com.maindark.livestream.form;
 
-import com.maindark.livestream.domain.LiveStreamUser;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
-
 import java.util.Date;
 @Data
 public class LiveStreamUserForm {
     //id equals mobile
-    @NotNull(message = "mobile cannot be empty")
+    @NotNull(message = "mobile can be not empty")
     private Long id;
-    @NotNull(message = "username cannot be empty")
+    @NotNull(message = "username can be not empty")
     private String nickName;
-    @NotNull(message = "password can not be empty")
+    @NotNull(message = "password can be not empty")
     private String password;
     private String head;
     private Date registerDate;

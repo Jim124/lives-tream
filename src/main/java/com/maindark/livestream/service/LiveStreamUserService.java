@@ -12,7 +12,6 @@ import com.maindark.livestream.result.CodeMsg;
 import com.maindark.livestream.util.MD5Util;
 import com.maindark.livestream.util.UUIDUtil;
 import com.maindark.livestream.vo.LiveStreamUserVo;
-import com.maindark.livestream.vo.LoginVo;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.Cookie;
