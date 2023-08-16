@@ -4,22 +4,28 @@ import com.alibaba.druid.util.StringUtils;
 import com.maindark.livestream.dao.LiveStreamUserDao;
 import com.maindark.livestream.domain.LiveStreamUser;
 import com.maindark.livestream.exception.GlobalException;
+import com.maindark.livestream.form.LiveStreamUserForm;
 import com.maindark.livestream.redis.LoginKey;
 import com.maindark.livestream.redis.RedisService;
 import com.maindark.livestream.redis.UserKey;
 import com.maindark.livestream.result.CodeMsg;
 import com.maindark.livestream.util.MD5Util;
 import com.maindark.livestream.util.UUIDUtil;
+import com.maindark.livestream.vo.LiveStreamUserVo;
 import com.maindark.livestream.vo.LoginVo;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class LiveStreamUserService {
     public static final String COOK_NAME_TOKEN = "token";
+    public static final String SALT= "1a2b3c";
     @Resource
     LiveStreamUserDao liveStreamUserDao;
     @Resource
@@ -40,32 +46,22 @@ public class LiveStreamUserService {
         return liveStreamUser;
     }
 
-    public String login(HttpServletResponse response,LoginVo loginVo) {
-        if(loginVo == null) {
-            throw new GlobalException(CodeMsg.SERVER_ERROR);
-        }
-        String mobile = loginVo.getMobile();
-        LiveStreamUser liveStreamUser = liveStreamUserDao.getById(Long.parseLong(mobile));
-        //validate the mobile is exit;
-        if(liveStreamUser == null) {
-            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
-        }
-        //validate the password is correct;
-        String formPass = loginVo.getPassword();
-        String dbPass = liveStreamUser.getPassword();
-        String saltDB = liveStreamUser.getSalt();
-        String calcPass = MD5Util.formPassToDBPass(formPass,saltDB);
-        if(!StringUtils.equals(dbPass,calcPass)){
-            throw new GlobalException(CodeMsg.PASSWORD_ERROR);
-        }
-        //generate token
-        String token = UUIDUtil.uuid();
-        redisService.set(LoginKey.token,token,liveStreamUser);
-        Cookie cookie = new Cookie(COOK_NAME_TOKEN,token);
-        cookie.setMaxAge(LoginKey.token.expireSeconds());
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        return token;
+    public LiveStreamUserVo findById(long id){
+        LiveStreamUserVo liveStreamUserVo = new LiveStreamUserVo();
+        LiveStreamUser liveStreamUser = liveStreamUserDao.getById(id);
+        BeanUtils.copyProperties(liveStreamUser,liveStreamUserVo);
+        return liveStreamUserVo;
+    }
+
+
+    public LiveStreamUser save(LiveStreamUserForm liveStreamUserForm) {
+        LiveStreamUser liveStreamUser = new LiveStreamUser();
+        BeanUtils.copyProperties(liveStreamUserForm,liveStreamUser);
+        liveStreamUser.setSalt(SALT);
+        liveStreamUser.setPassword(MD5Util.formPassToDBPass(liveStreamUserForm.getPassword(),SALT));
+        liveStreamUser.setRegisterDate(new Date());
+        liveStreamUserDao.insert(liveStreamUser);
+        return liveStreamUser;
     }
 
     public boolean updatePassword(String token, long id, String formPass) {
@@ -96,4 +92,6 @@ public class LiveStreamUserService {
         cookie.setPath("/");
         response.addCookie(cookie);
     }
+
+
 }

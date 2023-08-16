@@ -90,6 +90,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
             <version>3.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>cn.javaer.aliyun</groupId>
+            <artifactId>aliyun-spring-boot-starter-sms</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
